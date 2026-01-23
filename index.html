@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Expert - Majdoul Tower Permit System</title>
+    <title>بوابة تصاريح برج مجدول</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --main-blue: #1a2b48; --gold: #c5a059; --verify-green: #28a745; }
-        body { font-family: 'Arial', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        body { font-family: 'Arial', sans-serif; background: #f0f2f5; padding: 20px; }
         
+        /* لوحة التحكم */
         .admin-panel { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .col { flex: 1; min-width: 200px; }
@@ -22,7 +23,7 @@
 
         /* تصميم التصريح */
         #permit-area { 
-            width: 800px; background: white; margin: 40px auto; padding: 30px; 
+            width: 800px; background: white; margin: 40px auto; padding: 40px; 
             border: 1px solid #ddd; position: relative; display: none; box-sizing: border-box;
         }
         
@@ -31,34 +32,34 @@
             font-weight: bold; margin-bottom: 20px; border-radius: 4px; display: none;
         }
 
-        .header-logos { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--main-blue); padding-bottom: 15px; }
-        .logo-img { height: 70px; width: auto; object-fit: contain; }
+        .header-section { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--main-blue); padding-bottom: 15px; }
+        .logo-img { height: 90px; width: auto; }
         #qrcode { background: white; padding: 5px; border: 1px solid #eee; }
 
-        .title-section { text-align: center; margin: 20px 0; }
-        .title-section h1 { margin: 0; font-size: 26px; color: var(--main-blue); border-bottom: 2px solid var(--gold); display: inline-block; }
-        .serial-tag { font-family: monospace; font-size: 18px; color: #555; font-weight: bold; margin-top: 5px; display: block;}
+        .title-section { text-align: center; margin: 25px 0; }
+        .title-section h1 { margin: 0; font-size: 28px; color: var(--main-blue); border-bottom: 2px solid var(--gold); display: inline-block; padding-bottom: 5px; }
+        .serial-tag { font-family: monospace; font-size: 18px; color: #555; font-weight: bold; margin-top: 10px; display: block; }
 
         .info-table { width: 100%; margin: 20px 0; border-collapse: collapse; }
-        .info-table td { padding: 10px; border-bottom: 1px solid #f0f0f0; font-size: 15px; }
+        .info-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 16px; }
         .label-cell { color: #777; width: 140px; font-weight: bold; }
         .value-cell { font-weight: bold; color: #000; }
 
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid #000; }
-        .data-table th { background: #f8f9fa; border: 1px solid #000; padding: 10px; font-size: 14px; }
-        .data-table td { border: 1px solid #000; padding: 10px; text-align: center; font-size: 14px; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #000; }
+        .data-table th { background: #f8f9fa; border: 1px solid #000; padding: 12px; font-size: 15px; }
+        .data-table td { border: 1px solid #000; padding: 12px; text-align: center; font-size: 15px; }
 
-        .footer { margin-top: 50px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center; font-size: 12px; }
-        .sig-line { border-top: 1px solid #000; padding-top: 8px; font-weight: bold; height: 80px; }
-        .company-title { font-size: 10px; color: #444; display: block; margin-top: 5px; }
+        .footer { margin-top: 60px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center; font-size: 13px; }
+        .sig-line { border-top: 1px solid #000; padding-top: 10px; font-weight: bold; height: 100px; }
+        .link-expert-title { font-size: 11px; color: #444; display: block; margin-top: 5px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-<div id="verify-header" class="verify-badge">✅ تم التحقق: تصريح أصلي معتمد من Link Expert</div>
+<div id="verify-header" class="verify-badge">✅ تم التحقق: تصريح أصلي ومعتمد - برج مجدول</div>
 
 <div class="admin-panel" id="setup-form">
-    <h2 style="text-align: center; color: var(--main-blue);">بوابة تصاريح Link Expert - برج مجدول</h2>
+    <h2 style="text-align: center; color: var(--main-blue);">نظام إصدار التصاريح - برج مجدول</h2>
     
     <div class="row">
         <div class="col">
@@ -96,23 +97,22 @@
     </div>
 
     <div class="row">
-        <div class="col"><label>تاريخ الصلاحية من</label><input type="date" id="dS"></div>
-        <div class="col"><label>تاريخ الصلاحية إلى</label><input type="date" id="dE"></div>
+        <div class="col"><label>صلاحية من</label><input type="date" id="dS"></div>
+        <div class="col"><label>صلاحية إلى</label><input type="date" id="dE"></div>
     </div>
 
-    <div id="dynamic-rows-container">
+    <div id="items-area">
         <div id="dynamic-rows"></div>
-        <button class="btn" style="background:#eee; margin-top:10px; font-size: 12px;" onclick="addRow()">+ إضافة سطر جديد</button>
+        <button class="btn" style="background:#eee; margin-top:10px; font-size: 12px;" onclick="addRow()">+ إضافة سطر</button>
     </div>
 
-    <button class="btn btn-gen" onclick="generatePermit()">إصدار التصريح وتوليد الـ QR</button>
+    <button class="btn btn-gen" onclick="generatePermit()">إصدار التصريح (توليد QR)</button>
 </div>
 
 <div id="permit-area">
-    <div class="header-logos">
-        <img src="majdoul.png" class="logo-img" alt="Majdoul">
+    <div class="header-section">
+        <img src="majdoul.png" class="logo-img" alt="Logo">
         <div id="qrcode"></div>
-        <img src="linkexpert.png" class="logo-img" alt="Link Expert">
     </div>
 
     <div class="title-section">
@@ -127,7 +127,7 @@
         </tr>
         <tr>
             <td class="label-cell">مقدم الطلب:</td><td class="value-cell" id="p-req"></td>
-            <td class="label-cell">الصلاحية:</td><td class="value-cell" id="p-time"></td>
+            <td class="label-cell">التاريخ:</td><td class="value-cell" id="p-time"></td>
         </tr>
     </table>
 
@@ -137,15 +137,15 @@
     </table>
 
     <div class="footer">
-        <div class="sig-line">توقيع طالب التصريح<br><span id="sig-n" style="font-size:14px; color:#333;"></span></div>
+        <div class="sig-line">توقيع مقدم الطلب<br><span id="sig-n" style="font-size:14px; margin-top:5px; display:block;"></span></div>
         <div class="sig-line">
             Link Expert
-            <span class="company-title">الشركة المشغلة للمرافق الخارجية والمواقف للبرج</span>
+            <span class="link-expert-title">الشركة المشغلة للمرافق الخارجية والمواقف للبرج</span>
         </div>
-        <div class="sig-line">إدارة برج مجدول<br><span style="font-size: 10px;">Majdoul Tower Management</span></div>
+        <div class="sig-line">إدارة برج مجدول<br><span style="font-size: 10px; color:#666;">Majdoul Tower Management</span></div>
     </div>
 
-    <button class="btn btn-capture" id="cap-btn" onclick="takeShot()">حفظ كصورة PNG للإرسال عبر واتساب</button>
+    <button class="btn btn-capture" id="cap-btn" onclick="takeShot()">حفظ التصريح كصورة PNG</button>
 </div>
 
 <script>
@@ -177,9 +177,9 @@
         if(type.includes("عمال")) {
             div.innerHTML = `<input type="text" class="c1" placeholder="اسم العامل" style="flex:2">
                              <input type="text" class="c2" placeholder="رقم الهوية" style="flex:1">
-                             <input type="text" class="c3" placeholder="المهنة (مشرف/فني/عامل)" style="flex:1">`;
+                             <input type="text" class="c3" placeholder="المهنة" style="flex:1">`;
         } else {
-            div.innerHTML = `<input type="text" class="c1" placeholder="وصف المادة" style="flex:3">
+            div.innerHTML = `<input type="text" class="c1" placeholder="اسم المادة" style="flex:3">
                              <input type="number" class="c2" placeholder="الكمية" style="flex:1">`;
         }
         container.appendChild(div);
@@ -196,12 +196,12 @@
         document.getElementById('p-un').innerText = document.getElementById('unitSelect').value;
         document.getElementById('p-req').innerText = document.getElementById('reqName').value;
         document.getElementById('sig-n').innerText = document.getElementById('reqName').value;
-        document.getElementById('p-time').innerText = "من " + document.getElementById('dS').value + " إلى " + document.getElementById('dE').value;
+        document.getElementById('p-time').innerText = document.getElementById('dS').value + " إلى " + document.getElementById('dE').value;
         document.getElementById('p-serial').innerText = serial;
 
-        // توليد رابط التحقق الحقيقي
+        // QR Code التحقق
         const currentURL = window.location.href.split('?')[0];
-        const verificationLink = currentURL + "?verify=" + serial + "&type=" + encodeURIComponent(type);
+        const verificationLink = currentURL + "?verify=" + serial;
         
         document.getElementById("qrcode").innerHTML = "";
         new QRCode(document.getElementById("qrcode"), {
@@ -216,9 +216,9 @@
         thead.innerHTML = ""; tbody.innerHTML = "";
 
         if(type.includes("عمال")) {
-            thead.innerHTML = "<tr><th>الاسم بالكامل</th><th>رقم الهوية / الإقامة</th><th>المهنة</th></tr>";
+            thead.innerHTML = "<tr><th>الاسم الكامل</th><th>رقم الهوية</th><th>المهنة</th></tr>";
         } else {
-            thead.innerHTML = "<tr><th>وصف المواد / الأدوات</th><th>الكمية</th></tr>";
+            thead.innerHTML = "<tr><th>اسم المادة / الأداة</th><th>الكمية</th></tr>";
         }
 
         document.querySelectorAll('#dynamic-rows .row').forEach(r => {
@@ -242,7 +242,7 @@
         btn.style.display = 'none';
         html2canvas(document.getElementById('permit-area'), { scale: 3 }).then(canvas => {
             const link = document.createElement('a');
-            link.download = 'LinkExpert_Permit_' + Date.now() + '.png';
+            link.download = 'Majdoul_Permit_' + Date.now() + '.png';
             link.href = canvas.toDataURL();
             link.click();
             btn.style.display = 'block';
