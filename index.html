@@ -3,237 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام تصاريح برج مجدول - Majdoul Permits</title>
+    <title>Link Expert - Majdoul Tower Permits</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root { --main-blue: #0c2340; --gold: #a6893a; --success: #1e7e34; --bg: #f4f7f6; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        h2 { text-align: center; color: var(--main-blue); border-bottom: 2px solid var(--gold); padding-bottom: 15px; }
+        :root { --main-blue: #0c2340; --gold: #a6893a; --verify-green: #28a745; }
+        body { font-family: 'Arial', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
         
-        .section-box { background: #fafafa; border: 1px solid #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .input-group { margin-bottom: 15px; display: flex; flex-direction: column; }
-        label { font-weight: bold; margin-bottom: 5px; font-size: 13px; color: var(--main-blue); }
-        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline-color: var(--gold); }
+        /* واجهة الإدخال */
+        .admin-panel { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .col { flex: 1; min-width: 200px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--main-blue); }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .btn-gen { background: var(--main-blue); color: white; font-size: 16px; }
+        .btn-add { background: #eee; color: #333; margin-bottom: 10px; width: auto; font-size: 12px; }
 
-        /* Dynamic Table Style */
-        .dynamic-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .dynamic-table th { background: var(--main-blue); color: white; padding: 10px; font-size: 13px; }
-        .dynamic-table td { padding: 8px; border: 1px solid #ddd; }
-        .btn-add { background: var(--gold); color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; margin-top: 10px; }
-
-        /* Permit Document Style (Final Preview) */
-        #permit-document { 
-            width: 800px; padding: 40px; background: white; border: 2px solid #333; margin: 40px auto; display: none; 
-            box-shadow: 0 0 30px rgba(0,0,0,0.1); position: relative;
+        /* تصميم التصريح النهائي (للحفظ كصورة) */
+        #permit-area { 
+            width: 850px; background: white; margin: 40px auto; padding: 50px; 
+            border: 1px solid #ddd; display: none; box-sizing: border-box;
         }
-        .doc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--main-blue); padding-bottom: 10px; }
-        .header-center { text-align: center; flex: 1; }
-        .header-logo { width: 140px; text-align: right; }
-        .qr-area { width: 140px; }
-        
-        .permit-title { text-align: center; margin: 20px 0; font-size: 24px; font-weight: 900; color: var(--main-blue); text-decoration: underline; }
-        .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
-        .data-label { font-weight: bold; color: #555; font-size: 14px; }
-        .data-value { font-weight: bold; color: #000; }
 
-        .footer-sigs { display: flex; justify-content: space-between; margin-top: 50px; text-align: center; }
-        .sig-box { width: 30%; border-top: 1px solid #000; padding-top: 10px; font-size: 12px; font-weight: bold; }
+        /* الهيدر: الشعار يمين كبير، نص وسط، QR يسار */
+        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo-box { width: 180px; text-align: right; }
+        .logo-img { width: 100%; height: auto; }
+        .center-text { text-align: center; flex: 1; }
+        .center-text h2 { margin: 0; color: var(--main-blue); font-size: 26px; }
+        .center-text p { margin: 5px 0; font-size: 20px; font-weight: bold; color: var(--main-blue); }
+        #qrcode { width: 110px; height: 110px; background: white; padding: 5px; border: 1px solid #eee; }
+
+        .divider { height: 3px; background-color: var(--main-blue); width: 100%; margin-bottom: 30px; }
+
+        /* الجداول */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .data-table th { background: #f8f9fa; border: 1px solid #000; padding: 10px; font-size: 14px; text-align: center; }
+        .data-table td { border: 1px solid #000; padding: 10px; text-align: center; }
+
+        /* شاشة التحقق */
+        #verify-screen { 
+            display: none; max-width: 600px; margin: 50px auto; background: white; 
+            padding: 40px; border-radius: 20px; text-align: center; border-top: 15px solid var(--verify-green);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .footer { margin-top: 60px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center; }
+        .sig-box { border-top: 1px solid #000; padding-top: 10px; font-weight: bold; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<div class="container" id="form-container">
-    <h2>نظام إدارة تصاريح برج مجدول الموحد</h2>
-    
-    <div class="section-box">
-        <div class="grid-3">
-            <div class="input-group">
-                <label>نوع التصريح / Permit Type</label>
-                <select id="permitType" onchange="updateFormMode()">
-                    <option value="Labor">دخول عمال / Labor Entry</option>
-                    <option value="MaterialIn">دخول مواد / Material Entry</option>
-                    <option value="MaterialOut">خروج مواد / Material Exit</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>الشركة (مستأجر/مقاول) / Company</label>
-                <select id="companySelect" onchange="autoFillUnit()">
-                    <option value="">-- اختر الشركة --</option>
-                    <option value="Lenovo" data-unit="Floor 40">Lenovo - لينوفو (مقر إقليمي)</option>
-                    <option value="STC Solutions" data-unit="Floor 15">STC Solutions - حلول الاتصالات</option>
-                    <option value="Awtad" data-unit="Management">Awtad Real Estate - أوتاد العقارية</option>
-                    <option value="Sanabel" data-unit="Contractor">Rukan Sanabel - ركن سنابل (مقاولات)</option>
-                    <option value="Talco" data-unit="Floor 10">Talco Industrial - تالكو الصناعية</option>
-                    <option value="Daffah" data-unit="Floor 50">Daffah Group - مجموعة الدفة</option>
-                    <option value="Other">شركة أخرى / Other Company</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>الوحدة / Unit</label>
-                <input type="text" id="unitNo" placeholder="رقم الدور أو المكتب">
-            </div>
-        </div>
-        <div class="grid-3">
-            <div class="input-group"><label>تاريخ البدء</label><input type="date" id="startDate"></div>
-            <div class="input-group"><label>تاريخ الانتهاء</label><input type="date" id="expiryDate"></div>
-        </div>
+<div id="verify-screen">
+    <div style="font-size: 50px;">✅</div>
+    <h2 style="color: var(--verify-green);">تصريح أصلي ومعتمد</h2>
+    <p>بوابات برج مجدول - نظام Link Expert</p>
+    <div id="v-data" style="background: #f9f9f9; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: right;">
+        <p><strong>النوع:</strong> <span id="v-type"></span></p>
+        <p><strong>الجهة:</strong> <span id="v-co"></span></p>
+        <p><strong>تاريخ الانتهاء:</strong> <span id="v-exp" style="color:red; font-weight:bold;"></span></p>
     </div>
-
-    <div id="laborSection" class="section-box">
-        <label>بيانات العمال والموظفين:</label>
-        <table class="dynamic-table" id="laborTable">
-            <thead>
-                <tr>
-                    <th>اسم العامل</th>
-                    <th>رقم الهوية / الإقامة</th>
-                    <th>المهنة</th>
-                    <th>حذف</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="text" placeholder="الاسم الكامل"></td>
-                    <td><input type="text" placeholder="رقم الهوية"></td>
-                    <td>
-                        <select>
-                            <option>فني كهرباء</option><option>فني تكييف</option><option>تقني معلومات</option>
-                            <option>مشرف موقع</option><option>عامل نظافة</option><option>مهندس مدني</option>
-                            <option>فني اتصالات</option><option>نجار</option><option>سباك</option>
-                        </select>
-                    </td>
-                    <td><button onclick="this.parentElement.parentElement.remove()">X</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <button class="btn-add" onclick="addRow('laborTable')">+ إضافة عامل جديد</button>
-    </div>
-
-    <div id="materialSection" class="section-box" style="display:none;">
-        <label>بيانات المواد والمعدات:</label>
-        <table class="dynamic-table" id="materialTable">
-            <thead>
-                <tr>
-                    <th>اسم المادة / الوصف</th>
-                    <th>الكمية</th>
-                    <th>حذف</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="text" placeholder="مثال: شاشة كمبيوتر"></td>
-                    <td><input type="number" value="1"></td>
-                    <td><button onclick="this.parentElement.parentElement.remove()">X</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <button class="btn-add" onclick="addRow('materialTable')">+ إضافة مادة جديدة</button>
-    </div>
-
-    <button class="btn-add" style="width:100%; background:var(--main-blue); padding:15px; font-size:18px;" onclick="renderPermit()">إصدار التصريح النهائي</button>
+    <button class="btn" onclick="location.href=location.pathname" style="background:var(--main-blue); color:white;">إصدار تصريح جديد</button>
 </div>
 
-<div id="permit-document">
-    <div class="doc-header">
-        <div id="qrcode" class="qr-area"></div>
-        <div class="header-center">
-            <h2 style="margin:0; color:var(--main-blue);">برج مجدول - MAJDOUL TOWER</h2>
-            <p style="margin:5px 0; font-weight:bold;">نظام إدارة المرافق والتشغيل</p>
-            <small>Facility Management System</small>
-        </div>
-        <div class="header-logo">
-            <img src="https://majdoul.com/wp-content/uploads/2021/04/Logo-Final.png" style="width:100%;" alt="Logo">
-        </div>
-    </div>
-
-    <div class="permit-title" id="displayType">ENTRY PERMIT</div>
-
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-        <div class="data-row"><span class="data-label">الشركة:</span><span class="data-value" id="resCo"></span></div>
-        <div class="data-row"><span class="data-label">الوحدة:</span><span class="data-value" id="resUnit"></span></div>
-        <div class="data-row"><span class="data-label">صالح من:</span><span class="data-value" id="resStart"></span></div>
-        <div class="data-row"><span class="data-label">حتى تاريخ:</span><span class="data-value" id="resExp"></span></div>
-    </div>
-
-    <div id="resTableArea" style="margin-top:20px;"></div>
-
-    <div class="footer-sigs">
-        <div class="sig-box">توقيع المقاول/المستأجر<br>Tenant Signature</div>
-        <div class="sig-box">إدارة تشغيل المرافق<br>Facility Management</div>
-        <div class="sig-box">أمن البرج<br>Tower Security</div>
-    </div>
+<div class="admin-panel" id="admin-panel">
+    <h2 style="text-align: center; color: var(--main-blue);">بوابة تصاريح Link Expert - برج مجدول</h2>
     
-    <button id="downloadBtn" style="margin-top:20px; width:100%; padding:10px; background:green; color:white; border:none; border-radius:5px; cursor:pointer;" onclick="saveAsImage()">حفظ التصريح كصورة</button>
+    <div class="row">
+        <div class="col">
+            <label>نوع التصريح</label>
+            <select id="permitType" onchange="toggleForm()">
+                <option value="LABOR ENTRY / دخول عمال">دخول عمال</option>
+                <option value="MATERIAL ENTRY / دخول مواد">دخول مواد</option>
+                <option value="MATERIAL EXIT / خروج مواد">خروج مواد</option>
+            </select>
+        </div>
+        <div class="col">
+            <label>الشركة / المقاول</label>
+            <select id="company">
+                <option value="Lenovo / لينوفو">Lenovo / لينوفو</option>
+                <option value="Awtad / أوتاد">Awtad / أوتاد</option>
+                <option value="STC Solutions / حلول الاتصالات">STC Solutions</option>
+                <option value="Smith & Nephew">Smith & Nephew</option>
+                <option value="Other / أخرى">شركة أخرى</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col"><label>رقم الوحدة</label><input type="text" id="unit" placeholder="Floor 38 / Unit 5"></div>
+        <div class="col"><label>تاريخ الانتهاء</label><input type="date" id="expiry"></div>
+    </div>
+
+    <div id="dynamic-input-area">
+        <table class="data-table" id="inputTable">
+            <thead id="inputHead"></thead>
+            <tbody id="inputBody"></tbody>
+        </table>
+        <button class="btn btn-add" onclick="addNewRow()">+ إضافة سطر</button>
+    </div>
+
+    <button class="btn btn-gen" onclick="generatePermit()">إصدار التصريح (QR Active)</button>
+</div>
+
+<div id="permit-area">
+    <div class="header-section">
+        <div id="qrcode"></div> <div class="center-text"> <h2>برج مجدول</h2>
+            <p>Majdoul Tower</p>
+        </div>
+        <div class="logo-box"> <img src="majdoul.png" class="logo-img" alt="Logo">
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div style="text-align: center;">
+        <h1 id="p-title" style="margin:0; font-size: 28px; text-decoration: underline;"></h1>
+        <p id="p-serial" style="font-family: monospace; font-weight: bold;"></p>
+    </div>
+
+    <div class="row" style="margin-top:30px; border-bottom:1px solid #eee; padding-bottom:10px;">
+        <div class="col"><strong>الشركة:</strong> <span id="p-co"></span></div>
+        <div class="col"><strong>الوحدة:</strong> <span id="p-unit"></span></div>
+        <div class="col"><strong>تنتهي في:</strong> <span id="p-exp" style="color:red;"></span></div>
+    </div>
+
+    <table class="data-table">
+        <thead id="p-thead"></thead>
+        <tbody id="p-tbody"></tbody>
+    </table>
+
+    <div class="footer">
+        <div class="sig-box">توقيع المسؤول<br>Authorized Person</div>
+        <div class="sig-box">Link Expert<br><small>الشركة المشغلة للمرافق</small></div>
+        <div class="sig-box">إدارة البرج<br>Tower Management</div>
+    </div>
+
+    <button class="btn" id="cap-btn" onclick="takeShot()" style="background:var(--verify-green); color:white; margin-top:30px;">حفظ كصورة PNG للإرسال</button>
 </div>
 
 <script>
-    function updateFormMode() {
+    // وظيفة إضافة سطر بناءً على النوع
+    function toggleForm() {
         const type = document.getElementById('permitType').value;
-        document.getElementById('laborSection').style.display = (type === 'Labor') ? 'block' : 'none';
-        document.getElementById('materialSection').style.display = (type === 'Labor') ? 'none' : 'block';
-    }
-
-    function autoFillUnit() {
-        const sel = document.getElementById('companySelect');
-        const unit = sel.options[sel.selectedIndex].getAttribute('data-unit');
-        if(unit) document.getElementById('unitNo').value = unit;
-    }
-
-    function addRow(tableId) {
-        const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
-        const newRow = table.insertRow();
-        if(tableId === 'laborTable') {
-            newRow.innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><select><option>فني كهرباء</option><option>فني تكييف</option><option>تقني معلومات</option><option>مشرف</option></select></td><td><button onclick="this.parentElement.parentElement.remove()">X</button></td>`;
+        const head = document.getElementById('inputHead');
+        document.getElementById('inputBody').innerHTML = "";
+        
+        if(type.includes("LABOR")) {
+            head.innerHTML = "<tr><th>اسم العامل</th><th>رقم الهوية</th><th>المهنة</th></tr>";
         } else {
-            newRow.innerHTML = `<td><input type="text"></td><td><input type="number" value="1"></td><td><button onclick="this.parentElement.parentElement.remove()">X</button></td>`;
+            head.innerHTML = "<tr><th>اسم المادة</th><th>الكمية</th><th>ملاحظات</th></tr>";
         }
+        addNewRow();
     }
 
-    function renderPermit() {
-        document.getElementById('resCo').innerText = document.getElementById('companySelect').value;
-        document.getElementById('resUnit').innerText = document.getElementById('unitNo').value;
-        document.getElementById('resStart').innerText = document.getElementById('startDate').value;
-        document.getElementById('resExp').innerText = document.getElementById('expiryDate').value;
+    function addNewRow() {
         const type = document.getElementById('permitType').value;
-        document.getElementById('displayType').innerText = (type === 'Labor' ? "تصريح دخول عمال - LABOR ENTRY" : (type === 'MaterialIn' ? "دخول مواد - MATERIAL IN" : "خروج مواد - MATERIAL OUT"));
-
-        // Build Table in Doc
-        let html = `<table class="dynamic-table"><thead><tr>`;
-        if(type === 'Labor') {
-            html += `<th>اسم العامل</th><th>الهوية</th><th>المهنة</th></tr></thead><tbody>`;
-            const rows = document.querySelectorAll('#laborTable tbody tr');
-            rows.forEach(r => {
-                const ins = r.querySelectorAll('input, select');
-                html += `<tr><td>${ins[0].value}</td><td>${ins[1].value}</td><td>${ins[2].value}</td></tr>`;
-            });
+        const body = document.getElementById('inputBody');
+        const tr = document.createElement('tr');
+        if(type.includes("LABOR")) {
+            tr.innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><select><option>فني</option><option>مشرف</option><option>عامل</option><option>مهندس</option></select></td>`;
         } else {
-            html += `<th>المادة / الوصف</th><th>الكمية</th></tr></thead><tbody>`;
-            const rows = document.querySelectorAll('#materialTable tbody tr');
-            rows.forEach(r => {
-                const ins = r.querySelectorAll('input');
-                html += `<tr><td>${ins[0].value}</td><td>${ins[1].value}</td></tr>`;
-            });
+            tr.innerHTML = `<td><input type="text"></td><td><input type="number" value="1"></td><td><input type="text"></td>`;
         }
-        html += `</tbody></table>`;
-        document.getElementById('resTableArea').innerHTML = html;
+        body.appendChild(tr);
+    }
 
-        // QR Code
-        document.getElementById('qrcode').innerHTML = "";
-        new QRCode(document.getElementById("qrcode"), {
-            text: "Valid Permit: " + document.getElementById('companySelect').value + " | Exp: " + document.getElementById('expiryDate').value,
-            width: 120, height: 120
+    // وظيفة الإصدار وتفعيل الـ QR
+    function generatePermit() {
+        const type = document.getElementById('permitType').value;
+        const co = document.getElementById('company').value;
+        const exp = document.getElementById('expiry').value;
+        const unit = document.getElementById('unit').value;
+        const serial = "MTP-" + Math.floor(100000 + Math.random() * 900000);
+
+        document.getElementById('p-title').innerText = type;
+        document.getElementById('p-co').innerText = co;
+        document.getElementById('p-unit').innerText = unit;
+        document.getElementById('p-exp').innerText = exp;
+        document.getElementById('p-serial').innerText = "SERIAL: " + serial;
+
+        // توليد رابط التحقق الحقيقي لـ GitHub Pages
+        const baseURL = window.location.href.split('?')[0];
+        const vLink = `${baseURL}?v=1&t=${encodeURIComponent(type)}&c=${encodeURIComponent(co)}&e=${encodeURIComponent(exp)}`;
+
+        document.getElementById("qrcode").innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), { text: vLink, width: 110, height: 110 });
+
+        // نقل البيانات للجدول النهائي
+        document.getElementById('p-thead').innerHTML = document.getElementById('inputHead').innerHTML;
+        const rows = document.querySelectorAll('#inputBody tr');
+        let html = "";
+        rows.forEach(r => {
+            const vals = Array.from(r.querySelectorAll('input, select')).map(i => i.value);
+            html += `<tr>${vals.map(v => `<td>${v}</td>`).join('')}</tr>`;
         });
+        document.getElementById('p-tbody').innerHTML = html;
 
-        document.getElementById('permit-document').style.display = 'block';
+        document.getElementById('permit-area').style.display = "block";
         window.scrollTo(0, document.body.scrollHeight);
     }
 
-    function saveAsImage() {
-        const btn = document.getElementById('downloadBtn');
+    // تفعيل شاشة التحقق عند قراءة الـ QR
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('v')) {
+            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('verify-screen').style.display = 'block';
+            document.getElementById('v-type').innerText = urlParams.get('t');
+            document.getElementById('v-co').innerText = urlParams.get('c');
+            document.getElementById('v-exp').innerText = urlParams.get('e');
+        }
+        toggleForm();
+    }
+
+    function takeShot() {
+        const btn = document.getElementById('cap-btn');
         btn.style.display = 'none';
-        html2canvas(document.getElementById('permit-document')).then(canvas => {
+        html2canvas(document.getElementById('permit-area'), { scale: 3 }).then(canvas => {
             const link = document.createElement('a');
             link.download = 'Majdoul_Permit.png';
             link.href = canvas.toDataURL();
@@ -242,6 +231,5 @@
         });
     }
 </script>
-
 </body>
 </html>
