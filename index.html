@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permit Management System - Majdoul Tower</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a3a5f;
+            --accent: #d4af37;
+        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; color: #555; }
+        input, select, textarea { padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+
+        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
+        button { padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-generate { background: var(--primary); color: white; }
+        .btn-generate:hover { background: #112740; }
+        .btn-print { background: #28a745; color: white; }
+
+        /* Permit Styling for Print */
+        #permit-preview { display: none; margin-top: 40px; border: 2px solid #000; padding: 40px; position: relative; color: #000; }
+        .permit-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .logo-placeholder { font-weight: bold; font-size: 24px; color: var(--primary); }
+        .barcode-area { text-align: right; }
+        .permit-body { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .item-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .item-table th, .item-table td { border: 1px solid #000; padding: 8px; text-align: left; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            #permit-preview { display: block !important; border: none; }
+            body { background: white; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container no-print">
+    <h2>Permit Request System</h2>
+    
+    <div class="form-grid">
+        <div class="input-group">
+            <label>Permit Type</label>
+            <select id="permitType" onchange="toggleLaborFields()">
+                <option value="Material Exit">Material Exit Permit</option>
+                <option value="Material Entry">Material Entry Permit</option>
+                <option value="Labor">Labor Permit</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Company / Unit</label>
+            <select id="company">
+                <option>Majdoul 42/43</option>
+                <option>Majdoul 52</option>
+                <option>Awtad Unit 38</option>
+                <option>Rakal</option>
+                <option>Dan Unit 36/37</option>
+                <option>Smith & Nephew Unit 12</option>
+                <option>HUMAIN (16-21)</option>
+                <option>Beckman Coulter Unit 10</option>
+                <option>Emdad</option>
+                <option>MIM</option>
+                <option>Daffah Unit 39</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Authorized Person</label>
+            <input type="text" id="personName" placeholder="Full Name">
+        </div>
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="permitDate">
+        </div>
+    </div>
+
+    <div id="materialFields">
+        <label>Materials (Format: Item - Qty)</label>
+        <textarea id="materialList" rows="4" style="width: 100%;" placeholder="1. Tool Box - 2&#10;2. Drill - 1"></textarea>
+    </div>
+
+    <div id="laborFields" style="display:none;">
+        <label>Labor Details (Name - ID Number)</label>
+        <textarea id="laborList" rows="4" style="width: 100%;" placeholder="1. Shaban Malik - 2583404005"></textarea>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-generate" onclick="generatePermit()">Generate Permit</button>
+        <button class="btn-print" onclick="window.print()">Print Permit</button>
+    </div>
+</div>
+
+<div id="permit-preview">
+    <div class="permit-header">
+        <div>
+            <div class="logo-placeholder">MAJDOUL TOWER</div>
+            <h1 id="p-title" style="margin: 10px 0;">MATERIAL PERMIT</h1>
+        </div>
+        <div class="barcode-area">
+            <svg id="barcode"></svg>
+            <div id="p-serial" style="font-weight: bold;"></div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="permit-body">
+        <div>
+            <p><strong>Company:</strong> <span id="p-company"></span></p>
+            <p><strong>Authorized Person:</strong> <span id="p-person"></span></p>
+        </div>
+        <div>
+            <p><strong>Date:</strong> <span id="p-date"></span></p>
+            <p><strong>Location:</strong> Majdoul Tower, Riyadh</p>
+        </div>
+    </div>
+
+    <div id="p-content-area">
+        <table class="item-table" id="p-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Description / Details</th>
+                </tr>
+            </thead>
+            <tbody id="p-table-body"></tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 50px; display: flex; justify-content: space-between;">
+        <div style="border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 5px;">Security Signature</div>
+        <div style="border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 5px;">Management Stamp</div>
+    </div>
+</div>
+
+<script>
+    // Set default date to today
+    document.getElementById('permitDate').valueAsDate = new Date();
+
+    function toggleLaborFields() {
+        const type = document.getElementById('permitType').value;
+        document.getElementById('materialFields').style.display = type === 'Labor' ? 'none' : 'block';
+        document.getElementById('laborFields').style.display = type === 'Labor' ? 'block' : 'none';
+    }
+
+    function generatePermit() {
+        const type = document.getElementById('permitType').value;
+        const company = document.getElementById('company').value;
+        const person = document.getElementById('personName').value;
+        const date = document.getElementById('permitDate').value;
+        const serial = "MTP-" + Math.floor(100000 + Math.random() * 900000);
+
+        // Update Print Preview Text
+        document.getElementById('p-title').innerText = type.toUpperCase() + " PERMIT";
+        document.getElementById('p-company').innerText = company;
+        document.getElementById('p-person').innerText = person;
+        document.getElementById('p-date').innerText = date;
+        document.getElementById('p-serial').innerText = serial;
+
+        // Generate Barcode
+        JsBarcode("#barcode", serial, {
+            format: "CODE128",
+            width: 1.5,
+            height: 40,
+            displayValue: false
+        });
+
+        // Populate Table
+        const tbody = document.getElementById('p-table-body');
+        tbody.innerHTML = '';
+        const listText = type === 'Labor' ? document.getElementById('laborList').value : document.getElementById('materialList').value;
+        const lines = listText.split('\n');
+
+        lines.forEach((line, index) => {
+            if(line.trim() !== "") {
+                const row = `<tr><td>${index + 1}</td><td>${line}</td></tr>`;
+                tbody.innerHTML += row;
+            }
+        });
+
+        document.getElementById('permit-preview').style.display = 'block';
+        alert("Permit Generated Successfully!");
+    }
+</script>
+
+</body>
+</html>
