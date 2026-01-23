@@ -10,7 +10,7 @@
         :root { --main-blue: #1a2b48; --gold: #c5a059; --verify-green: #28a745; }
         body { font-family: 'Arial', sans-serif; background: #f0f2f5; padding: 20px; }
         
-        /* لوحة التحكم */
+        /* لوحة التحكم (المدخلات) */
         .admin-panel { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .col { flex: 1; min-width: 200px; }
@@ -21,37 +21,46 @@
         .btn-gen { background: var(--main-blue); color: white; width: 100%; font-size: 16px; margin-top: 10px; }
         .btn-capture { background: var(--verify-green); color: white; margin-top: 20px; width: 100%; font-size: 18px; }
 
-        /* تصميم التصريح */
+        /* تصميم التصريح النهائي (للتصوير) */
         #permit-area { 
-            width: 800px; background: white; margin: 40px auto; padding: 40px; 
+            width: 850px; background: white; margin: 40px auto; padding: 50px; 
             border: 1px solid #ddd; position: relative; display: none; box-sizing: border-box;
         }
         
+        /* شريط التحقق */
         .verify-badge { 
             background: var(--verify-green); color: white; padding: 10px; text-align: center; 
             font-weight: bold; margin-bottom: 20px; border-radius: 4px; display: none;
         }
 
-        .header-section { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--main-blue); padding-bottom: 15px; }
-        .logo-img { height: 90px; width: auto; }
+        /* الهيدر: الشعار كبير في اليسار، الـ QR في اليمين */
+        .header-section { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 4px solid var(--main-blue); 
+            padding-bottom: 20px; 
+            margin-bottom: 30px;
+        }
+        .logo-img { height: 140px; width: auto; } /* الشعار كبير */
         #qrcode { background: white; padding: 5px; border: 1px solid #eee; }
 
-        .title-section { text-align: center; margin: 25px 0; }
-        .title-section h1 { margin: 0; font-size: 28px; color: var(--main-blue); border-bottom: 2px solid var(--gold); display: inline-block; padding-bottom: 5px; }
-        .serial-tag { font-family: monospace; font-size: 18px; color: #555; font-weight: bold; margin-top: 10px; display: block; }
+        .title-section { text-align: center; margin: 30px 0; }
+        .title-section h1 { margin: 0; font-size: 34px; color: var(--main-blue); border-bottom: 3px solid var(--gold); display: inline-block; padding-bottom: 5px; }
+        .serial-tag { font-family: monospace; font-size: 20px; color: #444; font-weight: bold; margin-top: 10px; display: block; }
 
-        .info-table { width: 100%; margin: 20px 0; border-collapse: collapse; }
-        .info-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 16px; }
-        .label-cell { color: #777; width: 140px; font-weight: bold; }
+        .info-table { width: 100%; margin: 25px 0; border-collapse: collapse; }
+        .info-table td { padding: 15px; border-bottom: 1px solid #f0f0f0; font-size: 18px; }
+        .label-cell { color: #666; width: 150px; font-weight: bold; }
         .value-cell { font-weight: bold; color: #000; }
 
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #000; }
-        .data-table th { background: #f8f9fa; border: 1px solid #000; padding: 12px; font-size: 15px; }
-        .data-table td { border: 1px solid #000; padding: 12px; text-align: center; font-size: 15px; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 25px; border: 1px solid #000; }
+        .data-table th { background: #f8f9fa; border: 1px solid #000; padding: 15px; font-size: 17px; }
+        .data-table td { border: 1px solid #000; padding: 15px; text-align: center; font-size: 16px; }
 
-        .footer { margin-top: 60px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center; font-size: 13px; }
-        .sig-line { border-top: 1px solid #000; padding-top: 10px; font-weight: bold; height: 100px; }
-        .link-expert-title { font-size: 11px; color: #444; display: block; margin-top: 5px; line-height: 1.4; }
+        .footer { margin-top: 80px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; text-align: center; font-size: 14px; }
+        .sig-line { border-top: 1px solid #000; padding-top: 15px; font-weight: bold; height: 120px; }
+        .link-expert-title { font-size: 11px; color: #444; display: block; margin-top: 8px; line-height: 1.5; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -59,7 +68,7 @@
 <div id="verify-header" class="verify-badge">✅ تم التحقق: تصريح أصلي ومعتمد - برج مجدول</div>
 
 <div class="admin-panel" id="setup-form">
-    <h2 style="text-align: center; color: var(--main-blue);">نظام إصدار التصاريح - برج مجدول</h2>
+    <h2 style="text-align: center; color: var(--main-blue);">نظام تصاريح برج مجدول</h2>
     
     <div class="row">
         <div class="col">
@@ -72,46 +81,46 @@
         </div>
         <div class="col">
             <label>اسم طالب التصريح</label>
-            <input type="text" id="reqName" placeholder="الاسم الكامل">
+            <input type="text" id="reqName" placeholder="أدخل الاسم">
         </div>
     </div>
 
     <div class="row">
         <div class="col">
-            <label>الشركة المستأجرة</label>
+            <label>الشركة</label>
             <select id="company" onchange="loadUnits()">
                 <option value="">اختر الشركة</option>
-                <option value="Majdoul">Majdoul (42,43,52)</option>
-                <option value="Awtad">Awtad (38)</option>
+                <option value="Majdoul">Majdoul</option>
+                <option value="Awtad">Awtad</option>
                 <option value="Rakal">Rakal</option>
-                <option value="Dan">Dan (36,37)</option>
-                <option value="Smith & Nephew">Smith & Nephew (12)</option>
-                <option value="HUMAIN">HUMAIN (16-21)</option>
-                <option value="Beckman Coulter">Beckman Coulter (10)</option>
+                <option value="Dan">Dan</option>
+                <option value="Smith & Nephew">Smith & Nephew</option>
+                <option value="HUMAIN">HUMAIN</option>
+                <option value="Beckman Coulter">Beckman Coulter</option>
                 <option value="Emdad">Emdad</option>
                 <option value="MIM">MIM</option>
-                <option value="Daffah">Daffah (39)</option>
+                <option value="Daffah">Daffah</option>
             </select>
         </div>
-        <div class="col"><label>الوحدة / الدور</label><select id="unitSelect"></select></div>
+        <div class="col"><label>الوحدة</label><select id="unitSelect"></select></div>
     </div>
 
     <div class="row">
-        <div class="col"><label>صلاحية من</label><input type="date" id="dS"></div>
-        <div class="col"><label>صلاحية إلى</label><input type="date" id="dE"></div>
+        <div class="col"><label>تاريخ البداية</label><input type="date" id="dS"></div>
+        <div class="col"><label>تاريخ الانتهاء</label><input type="date" id="dE"></div>
     </div>
 
     <div id="items-area">
         <div id="dynamic-rows"></div>
-        <button class="btn" style="background:#eee; margin-top:10px; font-size: 12px;" onclick="addRow()">+ إضافة سطر</button>
+        <button class="btn" style="background:#eee; margin-top:10px;" onclick="addRow()">+ إضافة سطر جديد</button>
     </div>
 
-    <button class="btn btn-gen" onclick="generatePermit()">إصدار التصريح (توليد QR)</button>
+    <button class="btn btn-gen" onclick="generatePermit()">إصدار التصريح (QR Code)</button>
 </div>
 
 <div id="permit-area">
     <div class="header-section">
-        <img src="majdoul.png" class="logo-img" alt="Logo">
+        <img src="majdoul.png" class="logo-img" alt="Majdoul Logo">
         <div id="qrcode"></div>
     </div>
 
@@ -126,8 +135,8 @@
             <td class="label-cell">الوحدة:</td><td class="value-cell" id="p-un"></td>
         </tr>
         <tr>
-            <td class="label-cell">مقدم الطلب:</td><td class="value-cell" id="p-req"></td>
-            <td class="label-cell">التاريخ:</td><td class="value-cell" id="p-time"></td>
+            <td class="label-cell">اسم الطالب:</td><td class="value-cell" id="p-req"></td>
+            <td class="label-cell">الفترة:</td><td class="value-cell" id="p-time"></td>
         </tr>
     </table>
 
@@ -137,15 +146,15 @@
     </table>
 
     <div class="footer">
-        <div class="sig-line">توقيع مقدم الطلب<br><span id="sig-n" style="font-size:14px; margin-top:5px; display:block;"></span></div>
+        <div class="sig-line">توقيع الطالب<br><span id="sig-n" style="font-size:16px; margin-top:10px; display:block;"></span></div>
         <div class="sig-line">
             Link Expert
             <span class="link-expert-title">الشركة المشغلة للمرافق الخارجية والمواقف للبرج</span>
         </div>
-        <div class="sig-line">إدارة برج مجدول<br><span style="font-size: 10px; color:#666;">Majdoul Tower Management</span></div>
+        <div class="sig-line">إدارة برج مجدول<br><span style="font-size: 11px; color:#555;">Management Approval</span></div>
     </div>
 
-    <button class="btn btn-capture" id="cap-btn" onclick="takeShot()">حفظ التصريح كصورة PNG</button>
+    <button class="btn btn-capture" id="cap-btn" onclick="takeShot()">حفظ التصريح كصورة (Capture PNG)</button>
 </div>
 
 <script>
@@ -179,7 +188,7 @@
                              <input type="text" class="c2" placeholder="رقم الهوية" style="flex:1">
                              <input type="text" class="c3" placeholder="المهنة" style="flex:1">`;
         } else {
-            div.innerHTML = `<input type="text" class="c1" placeholder="اسم المادة" style="flex:3">
+            div.innerHTML = `<input type="text" class="c1" placeholder="وصف المادة" style="flex:3">
                              <input type="number" class="c2" placeholder="الكمية" style="flex:1">`;
         }
         container.appendChild(div);
@@ -199,15 +208,15 @@
         document.getElementById('p-time').innerText = document.getElementById('dS').value + " إلى " + document.getElementById('dE').value;
         document.getElementById('p-serial').innerText = serial;
 
-        // QR Code التحقق
+        // توليد الـ QR برابط التحقق
         const currentURL = window.location.href.split('?')[0];
         const verificationLink = currentURL + "?verify=" + serial;
         
         document.getElementById("qrcode").innerHTML = "";
         new QRCode(document.getElementById("qrcode"), {
             text: verificationLink,
-            width: 100,
-            height: 100,
+            width: 120,
+            height: 120,
             colorDark : "#1a2b48"
         });
 
@@ -216,9 +225,9 @@
         thead.innerHTML = ""; tbody.innerHTML = "";
 
         if(type.includes("عمال")) {
-            thead.innerHTML = "<tr><th>الاسم الكامل</th><th>رقم الهوية</th><th>المهنة</th></tr>";
+            thead.innerHTML = "<tr><th>اسم العامل</th><th>رقم الهوية</th><th>المهنة</th></tr>";
         } else {
-            thead.innerHTML = "<tr><th>اسم المادة / الأداة</th><th>الكمية</th></tr>";
+            thead.innerHTML = "<tr><th>المادة / الأداة</th><th>الكمية</th></tr>";
         }
 
         document.querySelectorAll('#dynamic-rows .row').forEach(r => {
@@ -242,7 +251,7 @@
         btn.style.display = 'none';
         html2canvas(document.getElementById('permit-area'), { scale: 3 }).then(canvas => {
             const link = document.createElement('a');
-            link.download = 'Majdoul_Permit_' + Date.now() + '.png';
+            link.download = 'Majdoul_Permit_PNG.png';
             link.href = canvas.toDataURL();
             link.click();
             btn.style.display = 'block';
