@@ -3,190 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Permit Management System - Majdoul Tower</title>
+    <title>Majdoul Tower - Permit System</title>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <style>
-        :root {
-            --primary: #1a3a5f;
-            --accent: #d4af37;
-        }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        :root { --dark-blue: #1a2b48; --gold: #c5a059; }
+        body { font-family: 'Arial', sans-serif; background: #e0e0e0; padding: 20px; direction: ltr; }
+        .no-print-zone { max-width: 800px; margin: 0 auto 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .input-group { display: flex; flex-direction: column; }
-        label { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; color: #555; }
-        input, select, textarea { padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        /* Print Layout Styling */
+        #permit-document { 
+            width: 210mm; min-height: 297mm; padding: 15mm; margin: auto; 
+            background: white; border: 1px solid #ccc; position: relative; display: none;
+            box-sizing: border-box;
+        }
+        
+        .header { display: flex; justify-content: space-between; align-items: start; }
+        .logo-area { text-align: left; }
+        .logo-text { font-size: 22px; font-weight: bold; color: var(--dark-blue); }
+        .permit-title { font-size: 28px; font-weight: bold; color: var(--dark-blue); text-align: center; margin-top: 20px; }
+        
+        .barcode-container { text-align: right; }
+        #barcode { width: 150px; }
+        .serial-text { font-family: monospace; font-weight: bold; margin-top: -5px; }
 
-        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
-        button { padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-generate { background: var(--primary); color: white; }
-        .btn-generate:hover { background: #112740; }
-        .btn-print { background: #28a745; color: white; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; border-top: 2px solid var(--dark-blue); padding-top: 20px; }
+        .info-item { margin-bottom: 12px; border-bottom: 1px dotted #ccc; padding-bottom: 5px; }
+        .label { font-weight: bold; font-size: 14px; color: #555; }
+        .value { font-size: 16px; font-weight: bold; }
 
-        /* Permit Styling for Print */
-        #permit-preview { display: none; margin-top: 40px; border: 2px solid #000; padding: 40px; position: relative; color: #000; }
-        .permit-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .logo-placeholder { font-weight: bold; font-size: 24px; color: var(--primary); }
-        .barcode-area { text-align: right; }
-        .permit-body { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .item-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .item-table th, .item-table td { border: 1px solid #000; padding: 8px; text-align: left; }
+        .material-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        .material-table th { background: var(--dark-blue); color: white; padding: 10px; border: 1px solid #ddd; }
+        .material-table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+
+        .instructions { margin-top: 40px; font-size: 11px; color: #444; border: 1px solid #eee; padding: 15px; background: #f9f9f9; }
+        .stamp-area { display: flex; justify-content: space-around; margin-top: 60px; text-align: center; }
+        .stamp-box { border-top: 1px solid #000; width: 150px; padding-top: 10px; font-size: 12px; }
+
+        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: var(--dark-blue); color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; }
         
         @media print {
-            .no-print { display: none !important; }
-            #permit-preview { display: block !important; border: none; }
+            .no-print-zone { display: none; }
+            #permit-document { display: block !important; border: none; }
             body { background: white; padding: 0; }
         }
     </style>
 </head>
 <body>
 
-<div class="container no-print">
-    <h2>Permit Request System</h2>
+<div class="no-print-zone">
+    <h2 style="color: var(--dark-blue)">Majdoul Tower Permit Creator</h2>
     
-    <div class="form-grid">
-        <div class="input-group">
-            <label>Permit Type</label>
-            <select id="permitType" onchange="toggleLaborFields()">
-                <option value="Material Exit">Material Exit Permit</option>
-                <option value="Material Entry">Material Entry Permit</option>
-                <option value="Labor">Labor Permit</option>
+    <label>Permit Type</label>
+    <select id="typeSelect" onchange="handleTypeChange()">
+        <option value="Material Exit">Material Exit Permit</option>
+        <option value="Material Entry">Material Entry Permit</option>
+        <option value="Labor">Labor Permit</option>
+    </select>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+            <label>Company</label>
+            <select id="companySelect" onchange="updateUnits()">
+                <option value="">Select Company</option>
+                <option value="Majdoul">Majdoul</option>
+                <option value="Awtad">Awtad</option>
+                <option value="Rakal">Rakal</option>
+                <option value="Dan">Dan</option>
+                <option value="Smith & Nephew">Smith & Nephew</option>
+                <option value="HUMAIN">HUMAIN</option>
+                <option value="Beckman Coulter">Beckman Coulter</option>
+                <option value="Emdad">Emdad</option>
+                <option value="MIM">MIM</option>
+                <option value="Daffah">Daffah</option>
             </select>
         </div>
-        <div class="input-group">
-            <label>Company / Unit</label>
-            <select id="company">
-                <option>Majdoul 42/43</option>
-                <option>Majdoul 52</option>
-                <option>Awtad Unit 38</option>
-                <option>Rakal</option>
-                <option>Dan Unit 36/37</option>
-                <option>Smith & Nephew Unit 12</option>
-                <option>HUMAIN (16-21)</option>
-                <option>Beckman Coulter Unit 10</option>
-                <option>Emdad</option>
-                <option>MIM</option>
-                <option>Daffah Unit 39</option>
-            </select>
-        </div>
-        <div class="input-group">
-            <label>Authorized Person</label>
-            <input type="text" id="personName" placeholder="Full Name">
-        </div>
-        <div class="input-group">
-            <label>Date</label>
-            <input type="date" id="permitDate">
+        <div>
+            <label>Unit</label>
+            <select id="unitSelect"></select>
         </div>
     </div>
 
-    <div id="materialFields">
-        <label>Materials (Format: Item - Qty)</label>
-        <textarea id="materialList" rows="4" style="width: 100%;" placeholder="1. Tool Box - 2&#10;2. Drill - 1"></textarea>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div><label>Date From</label><input type="date" id="dateFrom"></div>
+        <div><label>Date To</label><input type="date" id="dateTo"></div>
     </div>
 
-    <div id="laborFields" style="display:none;">
-        <label>Labor Details (Name - ID Number)</label>
-        <textarea id="laborList" rows="4" style="width: 100%;" placeholder="1. Shaban Malik - 2583404005"></textarea>
+    <div id="materialInput">
+        <label>Items (Item Name, Quantity)</label>
+        <textarea id="itemsText" rows="4" placeholder="Drill, 2&#10;Cable box, 5"></textarea>
     </div>
 
-    <div class="btn-group">
-        <button class="btn-generate" onclick="generatePermit()">Generate Permit</button>
-        <button class="btn-print" onclick="window.print()">Print Permit</button>
+    <div id="laborInput" style="display:none;">
+        <label>Staff (Name, ID, Job Title)</label>
+        <textarea id="laborText" rows="4" placeholder="Ahmed Ali, 1029384756, Technician&#10;John Doe, 203948576, Supervisor"></textarea>
     </div>
+
+    <button onclick="generatePermit()">Generate & Preview Permit</button>
 </div>
 
-<div id="permit-preview">
-    <div class="permit-header">
-        <div>
-            <div class="logo-placeholder">MAJDOUL TOWER</div>
-            <h1 id="p-title" style="margin: 10px 0;">MATERIAL PERMIT</h1>
+<div id="permit-document">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-text">برج مجدول<br>Majdoul Tower</div>
         </div>
-        <div class="barcode-area">
+        <div class="barcode-container">
             <svg id="barcode"></svg>
-            <div id="p-serial" style="font-weight: bold;"></div>
+            <div id="p-serial" class="serial-text"></div>
         </div>
     </div>
 
-    <hr>
+    <div class="permit-title" id="p-title">MATERIAL EXIT PERMIT</div>
 
-    <div class="permit-body">
-        <div>
-            <p><strong>Company:</strong> <span id="p-company"></span></p>
-            <p><strong>Authorized Person:</strong> <span id="p-person"></span></p>
-        </div>
-        <div>
-            <p><strong>Date:</strong> <span id="p-date"></span></p>
-            <p><strong>Location:</strong> Majdoul Tower, Riyadh</p>
-        </div>
+    <div class="info-grid">
+        <div class="info-item"><span class="label">Company:</span> <span class="value" id="p-company"></span></div>
+        <div class="info-item"><span class="label">Unit:</span> <span class="value" id="p-unit"></span></div>
+        <div class="info-item"><span class="label">Duration:</span> <span class="value" id="p-duration"></span></div>
+        <div class="info-item"><span class="label">Status:</span> <span class="value">Approved</span></div>
     </div>
 
-    <div id="p-content-area">
-        <table class="item-table" id="p-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Description / Details</th>
-                </tr>
-            </thead>
-            <tbody id="p-table-body"></tbody>
-        </table>
+    <table class="material-table">
+        <thead>
+            <tr id="table-header">
+                <th>#</th>
+                <th>Description</th>
+                <th>Quantity / ID Number</th>
+                <th id="job-header" style="display:none;">Job Title</th>
+            </tr>
+        </thead>
+        <tbody id="p-body"></tbody>
+    </table>
+
+    <div class="instructions">
+        <strong>Terms and Instructions:</strong><br>
+        1. This permit is valid only for the dates specified above.<br>
+        2. All personnel must carry valid identification at all times.<br>
+        3. Materials listed are subject to physical inspection at Gate 3 / P2 Loading Area.<br>
+        4. Majdoul Tower management is not responsible for loss of tools not registered.
     </div>
 
-    <div style="margin-top: 50px; display: flex; justify-content: space-between;">
-        <div style="border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 5px;">Security Signature</div>
-        <div style="border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 5px;">Management Stamp</div>
+    <div class="stamp-area">
+        <div class="stamp-box">Company Representative</div>
+        <div class="stamp-box">Security Supervisor</div>
+        <div class="stamp-box">Tower Management</div>
     </div>
+    
+    <button class="no-print-zone" style="margin-top:20px; width: 100%;" onclick="window.print()">Print Official Document</button>
 </div>
 
 <script>
-    // Set default date to today
-    document.getElementById('permitDate').valueAsDate = new Date();
+    const dataMap = {
+        "Majdoul": ["42", "43", "52"],
+        "Awtad": ["Unit 38"],
+        "Rakal": ["General"],
+        "Dan": ["Unit 36", "Unit 37"],
+        "Smith & Nephew": ["Unit 12"],
+        "HUMAIN": ["16", "17", "18", "19", "20", "21"],
+        "Beckman Coulter": ["Unit 10"],
+        "Emdad": ["General"],
+        "MIM": ["General"],
+        "Daffah": ["Unit 39"]
+    };
 
-    function toggleLaborFields() {
-        const type = document.getElementById('permitType').value;
-        document.getElementById('materialFields').style.display = type === 'Labor' ? 'none' : 'block';
-        document.getElementById('laborFields').style.display = type === 'Labor' ? 'block' : 'none';
+    function updateUnits() {
+        const co = document.getElementById('companySelect').value;
+        const unitSel = document.getElementById('unitSelect');
+        unitSel.innerHTML = "";
+        if(dataMap[co]) {
+            dataMap[co].forEach(u => {
+                let opt = document.createElement('option');
+                opt.value = u; opt.innerHTML = u;
+                unitSel.appendChild(opt);
+            });
+        }
+    }
+
+    function handleTypeChange() {
+        const type = document.getElementById('typeSelect').value;
+        document.getElementById('materialInput').style.display = type.includes('Material') ? 'block' : 'none';
+        document.getElementById('laborInput').style.display = type === 'Labor' ? 'block' : 'none';
     }
 
     function generatePermit() {
-        const type = document.getElementById('permitType').value;
-        const company = document.getElementById('company').value;
-        const person = document.getElementById('personName').value;
-        const date = document.getElementById('permitDate').value;
+        const type = document.getElementById('typeSelect').value;
         const serial = "MTP-" + Math.floor(100000 + Math.random() * 900000);
-
-        // Update Print Preview Text
+        
         document.getElementById('p-title').innerText = type.toUpperCase() + " PERMIT";
-        document.getElementById('p-company').innerText = company;
-        document.getElementById('p-person').innerText = person;
-        document.getElementById('p-date').innerText = date;
+        document.getElementById('p-company').innerText = document.getElementById('companySelect').value;
+        document.getElementById('p-unit').innerText = document.getElementById('unitSelect').value;
+        document.getElementById('p-duration').innerText = document.getElementById('dateFrom').value + " to " + document.getElementById('dateTo').value;
         document.getElementById('p-serial').innerText = serial;
 
-        // Generate Barcode
-        JsBarcode("#barcode", serial, {
-            format: "CODE128",
-            width: 1.5,
-            height: 40,
-            displayValue: false
-        });
+        JsBarcode("#barcode", serial, { height: 35, displayValue: false });
 
-        // Populate Table
-        const tbody = document.getElementById('p-table-body');
-        tbody.innerHTML = '';
-        const listText = type === 'Labor' ? document.getElementById('laborList').value : document.getElementById('materialList').value;
-        const lines = listText.split('\n');
+        const tbody = document.getElementById('p-body');
+        tbody.innerHTML = "";
+        
+        if(type.includes("Material")) {
+            document.getElementById('job-header').style.display = "none";
+            const lines = document.getElementById('itemsText').value.split('\n');
+            lines.forEach((line, i) => {
+                if(!line) return;
+                const parts = line.split(',');
+                tbody.innerHTML += `<tr><td>${i+1}</td><td>${parts[0] || ''}</td><td>${parts[1] || '1'}</td></tr>`;
+            });
+        } else {
+            document.getElementById('job-header').style.display = "table-cell";
+            const lines = document.getElementById('laborText').value.split('\n');
+            lines.forEach((line, i) => {
+                if(!line) return;
+                const parts = line.split(',');
+                tbody.innerHTML += `<tr><td>${i+1}</td><td>${parts[0] || ''}</td><td>${parts[1] || ''}</td><td>${parts[2] || ''}</td></tr>`;
+            });
+        }
 
-        lines.forEach((line, index) => {
-            if(line.trim() !== "") {
-                const row = `<tr><td>${index + 1}</td><td>${line}</td></tr>`;
-                tbody.innerHTML += row;
-            }
-        });
-
-        document.getElementById('permit-preview').style.display = 'block';
-        alert("Permit Generated Successfully!");
+        document.getElementById('permit-document').style.display = "block";
+        window.scrollTo(0, document.body.scrollHeight);
     }
 </script>
 
