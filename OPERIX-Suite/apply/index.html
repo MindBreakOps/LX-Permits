@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers Portal | OPERIX</title>
+    <style>
+        :root {
+            --bg-deep: #f0eff5; 
+            --bg-card: #ffffff;
+            --accent: #9a6f28; 
+            --navy: #1e2d40; 
+            --text-1: #18161f;
+            --text-muted: #7c788f;
+            --border: rgba(0,0,0,0.08);
+            --radius-md: 12px;
+            --font: 'Space Grotesk', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
+        
+        body { font-family: var(--font); background: var(--bg-deep); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background: var(--bg-card); padding: 40px; border-radius: var(--radius-md); box-shadow: 0 10px 40px rgba(0,0,0,0.08); width: 100%; max-width: 500px; box-sizing: border-box; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--navy); }
+        .form-control { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-family: var(--font); background: #f9f9fb; font-size: 14px; transition: 0.2s; }
+        .form-control:focus { outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(154, 111, 40, 0.1); }
+        
+        .btn { width: 100%; padding: 14px; background: var(--navy); color: white; border: none; border-radius: 8px; font-weight: 700; font-family: var(--font); font-size: 15px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn:hover { background: var(--accent); transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        
+        .hidden { display: none !important; }
+        
+        .logo-area { text-align: center; margin-bottom: 24px; }
+        .logo-area img { max-height: 45px; object-fit: contain; }
+        .logo-text { font-weight: 800; font-size: 24px; color: var(--navy); letter-spacing: 1px; }
+        .logo-text span { color: var(--accent); }
+
+        .checkbox-group { display: flex; gap: 12px; align-items: flex-start; margin-top: 25px; margin-bottom: 20px; }
+        .checkbox-group input[type="checkbox"] { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+        .checkbox-group label { font-size: 12px; color: var(--text-muted); line-height: 1.5; cursor: pointer; }
+        .checkbox-group a { color: var(--navy); font-weight: 700; text-decoration: none; }
+
+        .captcha-box { background: rgba(154, 111, 40, 0.05); border: 1px dashed var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="passcode-screen" class="card">
+       <div class="logo-area">
+           <img src="https://raw.githubusercontent.com/MindBreakOps/LX-Permits/main/imind.png" alt="OPERIX HR Logo" style="max-height: 55px; object-fit: contain; margin-bottom: 10px;">
+       </div>
+        <p style="text-align: center; font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 5px;">Applicant Portal</p>
+        <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 25px; margin-top:0;">Please enter the registration passcode provided to you.</p>
+        
+        <div class="form-group">
+            <input type="password" id="passcode-input" class="form-control" placeholder="Enter Secure Passcode">
+        </div>
+        <button id="passcode-btn" onclick="verifyPasscode()" class="btn">Authenticate</button>
+        <p id="passcode-error" style="color: #ef4444; font-size: 13px; text-align: center; display: none; margin-top: 15px; font-weight: 600;"></p>
+    </div>
+
+    <div id="application-screen" class="card hidden">
+        <div class="logo-area" style="margin-bottom: 20px;">
+            <img src="https://raw.githubusercontent.com/MindBreakOps/LX-Permits/main/imind.png" alt="OPERIX HR Logo" style="max-height: 45px; object-fit: contain; margin-bottom: 10px;">
+            <div class="logo-text" style="font-size: 20px;">OPERIX<span>.</span> HR</div>
+        </div>
+        <h2 style="text-align: center; color: var(--navy); margin-top: 0; margin-bottom: 25px; font-size: 22px;">Submit Application</h2>
+        
+        <div class="form-group">
+            <label class="form-label">Position Applying For *</label>
+            <select id="app-job" class="form-control" required>
+                <option value="" disabled selected>Loading Open Positions...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="app-name" class="form-control" placeholder="E.g. Ahmed Ali" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" id="app-email" class="form-control" placeholder="email@domain.com" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            <input type="tel" id="app-phone" class="form-control" placeholder="+966 5X XXX XXXX" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Upload CV / Resume (PDF/Word) *</label>
+            <input type="file" id="app-resume" class="form-control" accept=".pdf,.doc,.docx" required>
+        </div>
+
+        <div class="captcha-box">
+            <label class="form-label" style="margin-bottom: 10px;">Security Check *</label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="captcha-question" style="font-weight: 700; font-size: 16px; color: var(--navy); white-space: nowrap;">What is 0 + 0?</span>
+                <input type="number" id="app-captcha" class="form-control" placeholder="Answer" style="width: 100px; padding: 8px 12px;" required>
+            </div>
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="app-agreement" required>
+            <label for="app-agreement">
+                I declare that all information provided is accurate and truthful. I have read and agree to the Terms and Privacy Policy.
+            </label>
+        </div>
+        
+        <button onclick="submitApplication()" id="submit-btn" class="btn">Sign & Submit Application</button>
+        <p id="app-message" style="font-size: 14px; text-align: center; margin-top: 15px; font-weight: 700;"></p>
+    </div>
+
+    <script>
+        // ==========================================
+        // SYSTEM CONFIGURATION
+        // ==========================================
+  
+       const SUPABASE_URL = "https://lzobdqlbsxjlupyewdqq.supabase.co"; 
+       
+       // YOUR REAL KEY IS BACK:
+       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6b2JkcWxic3hqbHVweWV3ZHFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTY0MDQsImV4cCI6MjA4OTU3MjQwNH0.fH-bV3QiQUbk_6L-clwwdHlZTnTIYAIJeKysMhUlBIs"; 
+       
+       const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxhVlE743ENk3EwhG5djL9KunWBe2syPgHDhkJnzN4LaHyzpGuxbQhwGjmZVYf4ngpi/exec";
+        // CAPTCHA Variables
+        let captchaExpected = 0;
+
+        function generateCaptcha() {
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            captchaExpected = num1 + num2;
+            document.getElementById('captcha-question').textContent = `What is ${num1} + ${num2}?`;
+            document.getElementById('app-captcha').value = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', generateCaptcha);
+
+        /**
+         * DYNAMICALLY FETCH OPEN REQUISITIONS FROM SUPABASE
+         */
+       /**
+        * DYNAMICALLY FETCH OPEN JOBS FROM SUPABASE
+        */
+       async function loadOpenJobs() {
+           const jobSelect = document.getElementById('app-job');
+           try {
+               // FIXED: Changed to operix_jobs to match your database
+               const res = await fetch(`${SUPABASE_URL}/rest/v1/operix_jobs?status=eq.Open&select=id,title`, {
+                   headers: {
+                       'apikey': SUPABASE_ANON_KEY,
+                       'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                   }
+               });
+       
+               if (!res.ok) throw new Error("Could not fetch jobs");
+               const jobs = await res.json();
+       
+               jobSelect.innerHTML = '<option value="" disabled selected>-- Select a Position --</option>';
+               
+               if (jobs.length === 0) {
+                   jobSelect.innerHTML += '<option value="" disabled>No open positions at this time</option>';
+               } else {
+                   jobs.forEach(job => {
+                       // This will now insert your real UUIDs and Job Titles!
+                       jobSelect.innerHTML += `<option value="${job.id}">${job.title}</option>`;
+                   });
+               }
+           } catch (err) {
+               console.error("Error loading jobs:", err);
+               jobSelect.innerHTML = '<option value="" disabled selected>Error loading positions</option>';
+           }
+       }
+
+        /**
+         * Verify Passcode & Load Jobs
+         */
+        async function verifyPasscode() {
+            const input = document.getElementById('passcode-input').value.trim();
+            const btn = document.getElementById('passcode-btn');
+            const errorEl = document.getElementById('passcode-error');
+            
+            if (!input) return;
+
+            btn.disabled = true;
+            btn.textContent = "Verifying...";
+            errorEl.style.display = 'none';
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/operix_settings?key=eq.operix_hr_external_passcode&select=value`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                if (!res.ok) throw new Error("Database connection failed");
+                const data = await res.json();
+                
+                if (data.length > 0 && input === data[0].value) {
+                    // Success! Show form and dynamically load jobs
+                    document.getElementById('passcode-screen').classList.add('hidden');
+                    document.getElementById('application-screen').classList.remove('hidden');
+                    generateCaptcha(); 
+                    
+                    // Trigger the fetch for open requisitions
+                    loadOpenJobs(); 
+                } else {
+                    errorEl.textContent = "Access Denied: Invalid Passcode";
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                console.error("Passcode Auth Error:", err);
+                errorEl.textContent = "System Error: Unable to verify passcode.";
+                errorEl.style.display = 'block';
+            }
+
+            btn.disabled = false;
+            btn.textContent = "Authenticate";
+        }
+
+        /**
+         * Submit Application
+         */
+        async function submitApplication() {
+            const jobSelect = document.getElementById('app-job');
+            const jobId = jobSelect.value; // Grabs the UUID for the database
+            const jobTitleName = jobSelect.options[jobSelect.selectedIndex]?.text || "Unknown"; // Grabs the readable name
+
+            const name = document.getElementById('app-name').value.trim();
+            const email = document.getElementById('app-email').value.trim();
+            const phone = document.getElementById('app-phone').value.trim();
+            const resumeFile = document.getElementById('app-resume').files[0];
+            const captchaInput = parseInt(document.getElementById('app-captcha').value.trim());
+            const agreed = document.getElementById('app-agreement').checked;
+            
+            const msgEl = document.getElementById('app-message');
+            const btn = document.getElementById('submit-btn');
+
+            // --- VALIDATION ---
+            if (!jobId || !name || !email || !phone || !resumeFile) {
+                msgEl.textContent = "Please complete all required fields and attach a CV.";
+                msgEl.style.color = "#ef4444";
+                return;
+            }
+
+            if (!agreed) {
+                msgEl.textContent = "You must agree to the Terms to apply.";
+                msgEl.style.color = "#ef4444";
+                return;
+            }
+
+            if (isNaN(captchaInput) || captchaInput !== captchaExpected) {
+                msgEl.textContent = "Security check failed. Please solve the math problem.";
+                msgEl.style.color = "#ef4444";
+                generateCaptcha(); 
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "Uploading & Submitting...";
+            msgEl.textContent = "";
+
+            try {
+                // 1. Upload to Google Drive via Your Main System GAS
+                const resumeUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(resumeFile);
+                    reader.onload = async () => {
+                        try {
+                            const base64Data = reader.result.split(',')[1];
+                            
+                            // IMPORTANT: Match this payload to what your GAS script actually expects.
+                            // If your script uses a different 'action' key (like 'upload' instead of 'uploadResume'), change it here.
+                            const gasPayload = {
+                                action: "uploadResume", 
+                                fileName: `CV_${name.replace(/\s+/g, '_')}_${Date.now()}`,
+                                mimeType: resumeFile.type,
+                                fileData: base64Data
+                            };
+
+                            const uploadRes = await fetch(GAS_API_URL, {
+                                method: "POST",
+                                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                                body: JSON.stringify(gasPayload)
+                            });
+                            
+                            const result = await uploadRes.json();
+                            
+                            // Adjusting to handle generic success responses from GAS
+                            if (result.success || result.url || result.fileUrl) {
+                                resolve(result.fileUrl || result.url || "Upload successful");
+                            } else {
+                                console.warn("GAS Upload Error Response:", result);
+                                resolve("Upload failed - Check GAS Script");
+                            }
+                        } catch (err) {
+                            console.error("GAS Fetch Error:", err);
+                            resolve("Upload Error - Connection failed");
+                        }
+                    };
+                    reader.onerror = () => reject("File reading error");
+                });
+
+                // 2. Insert into OPERIX ATS Kanban 
+                const payload = {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    job_id: jobId, // Now uses the actual Database UUID
+                    stage: 'New',  
+                    notes: `*External Application*\nTarget Position: ${jobTitleName}\nDrive Link: ${resumeUrl}`
+                };
+
+                const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/operix_applicants`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!insertRes.ok) throw new Error("Failed to insert into ATS");
+
+                // 3. Success Feedback
+                document.getElementById('application-screen').innerHTML = `
+                    <div style="text-align: center; padding: 40px 0;">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 20px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <h2 style="color: var(--navy); margin-top:0;">Thank You!</h2>
+                        <p style="color: var(--text-muted);">Your application for ${jobTitleName} has been securely received.</p>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error("Submission Error:", error);
+                msgEl.textContent = "Error submitting application. Please try again.";
+                msgEl.style.color = "#ef4444";
+                btn.disabled = false;
+                btn.textContent = "Sign & Submit Application";
+                generateCaptcha(); 
+            }
+        }
+    </script>
+</body>
+</html>
